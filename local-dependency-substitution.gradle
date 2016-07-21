@@ -28,11 +28,7 @@ def substitutions = [] as Set<Dependency>
 
 /* 1. Ensure local.dependencies exists */
 
-if (!config.exists()) {
-  def template = new File('.local.dependencies.template')
-  config << template.text
-  template.delete()
-}
+config.exists() || config << new File('.local.dependencies.template').text
 
 /* 2. Substitute each dependencies declared in local.dependencies with the ":local" version. */
 
