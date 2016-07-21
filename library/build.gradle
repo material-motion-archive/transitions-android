@@ -25,6 +25,7 @@ android {
 
 dependencies {
   // If you are developing any dependencies locally, also list them in local.dependencies.
+  compile 'com.github.material-motion:material-motion-runtime-android:+'
 }
 
 // build a jar with source files

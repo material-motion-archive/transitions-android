@@ -13,13 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.android.material.motion.transitions;
 
-/**
- * Material Motion Android Transitions library class.
- */
-public class Library {
+import com.google.android.material.motion.runtime.Transaction;
 
-  public static final String LIBRARY_NAME = "Material Motion Android Transitions";
+/**
+ *
+ */
+public abstract class Director {
+
+  private TransactCallback callback;
+
+  final void init(TransactCallback callback) {
+    this.callback = callback;
+  }
+
+  public abstract void setUp(Transaction transaction);
+
+  protected void transact(Work work) {
+    callback.transact(work);
+  }
+
+  public void tearDown() {}
+
+  protected static abstract class Work {
+
+    public abstract void work(Transaction transaction);
+  }
+
+  interface TransactCallback {
+
+    void transact(Work work);
+  }
 }

@@ -16,16 +16,22 @@
 
 package com.google.android.material.motion.transitions.sample;
 
-import com.google.android.material.motion.transitions.Library;
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+import com.google.android.material.motion.runtime.Performer;
+import com.google.android.material.motion.runtime.Performer.PlanPerformance;
+import com.google.android.material.motion.runtime.Plan;
+import com.google.android.material.motion.runtime.Scheduler;
+import com.google.android.material.motion.runtime.Transaction;
+import com.google.android.material.motion.transitions.Director;
 
 /**
  * Material Motion Android Transitions sample Activity.
  */
 public class MainActivity extends AppCompatActivity {
+
+  private TextView textView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +39,40 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.main_activity);
 
-    TextView text = (TextView) findViewById(R.id.text);
-    text.setText(Library.LIBRARY_NAME);
+    textView = (TextView) findViewById(R.id.text);
+
+    Scheduler scheduler = new Scheduler();
+    Transaction transaction = new Transaction();
+
+    DemoDirector director = new DemoDirector();
+    director.setUp(transaction);
+
+    scheduler.commitTransaction(transaction);
+  }
+
+  private class DemoDirector extends Director {
+
+    @Override
+    public void setUp(Transaction transaction) {
+      transaction.addPlan(new DemoPlan(), textView);
+    }
+  }
+
+  private static class DemoPlan extends Plan {
+    private final String text = "test";
+
+    @Override
+    public Class<? extends Performer> getPerformerClass() {
+      return DemoPerformer.class;
+    }
+  }
+
+  public static class DemoPerformer extends Performer implements PlanPerformance {
+
+    @Override
+    public void addPlan(Plan plan) {
+      TextView target = getTarget();
+      target.setText(((DemoPlan) plan).text);
+    }
   }
 }
