@@ -2,6 +2,8 @@
 
 The Material Motion Android Transitions repo.
 
+The code in this repository is a work in progress. Use at your own risk.
+
 ## Depending on the library
 
 Use Jitpack to depend on any of our [public releases](https://github.com/material-motion/material-motion-transitions-android/releases).
