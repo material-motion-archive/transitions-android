@@ -16,7 +16,8 @@
 package com.google.android.material.motion.transitions;
 
 import android.view.View;
-import com.google.android.material.motion.runtime.Transaction;
+
+import com.google.android.material.motion.runtime.MotionRuntime;
 
 /**
  *
@@ -25,9 +26,10 @@ public abstract class Director {
 
   private TransactCallback callback;
 
-  public abstract void setUp(Transaction transaction);
+  public abstract void setUp(MotionRuntime runtime);
 
-  public void tearDown() {}
+  public void tearDown() {
+  }
 
   final void setTransactCallback(TransactCallback callback) {
     this.callback = callback;
@@ -39,7 +41,7 @@ public abstract class Director {
 
   protected static abstract class Work {
 
-    public abstract void work(Transaction transaction);
+    public abstract void work(MotionRuntime runtime);
   }
 
   interface TransactCallback {
@@ -50,11 +52,11 @@ public abstract class Director {
   public static class DirectorInstantiationException extends RuntimeException {
     public DirectorInstantiationException(Class<? extends Director> klass, Exception cause) {
       super(
-          "Unable to instantiate Director "
-              + klass.getName()
-              + ": make sure class name exists, is public, and has an empty constructor that is "
-              + "public",
-          cause);
+        "Unable to instantiate Director "
+          + klass.getName()
+          + ": make sure class name exists, is public, and has an empty constructor that is "
+          + "public",
+        cause);
     }
   }
 

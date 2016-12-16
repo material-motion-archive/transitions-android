@@ -19,11 +19,10 @@ package com.google.android.material.motion.transitions.sample;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
+
+import com.google.android.material.motion.runtime.MotionRuntime;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.Scheduler;
-import com.google.android.material.motion.runtime.Transaction;
 import com.google.android.material.motion.transitions.Director;
 
 /**
@@ -41,33 +40,30 @@ public class MainActivity extends AppCompatActivity {
 
     textView = (TextView) findViewById(R.id.text);
 
-    Scheduler scheduler = new Scheduler();
-    Transaction transaction = new Transaction();
+    MotionRuntime runtime = new MotionRuntime();
 
     DemoDirector director = new DemoDirector();
-    director.setUp(transaction);
-
-    scheduler.commitTransaction(transaction);
+    director.setUp(runtime);
   }
 
   private class DemoDirector extends Director {
 
     @Override
-    public void setUp(Transaction transaction) {
-      transaction.addPlan(new DemoPlan(), textView);
+    public void setUp(MotionRuntime runtime) {
+      runtime.addPlan(new DemoPlan(), textView);
     }
   }
 
-  private static class DemoPlan extends Plan {
+  private static class DemoPlan extends Plan<TextView> {
     private final String text = "test";
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<TextView>> getPerformerClass() {
       return DemoPerformer.class;
     }
   }
 
-  public static class DemoPerformer extends Performer implements PlanPerformance {
+  public static class DemoPerformer extends Performer<TextView> {
 
     @Override
     public void addPlan(Plan plan) {

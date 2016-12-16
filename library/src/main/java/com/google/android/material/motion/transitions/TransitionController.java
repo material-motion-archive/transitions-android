@@ -15,20 +15,20 @@
  */
 package com.google.android.material.motion.transitions;
 
-import com.google.android.material.motion.runtime.Scheduler;
-import com.google.android.material.motion.runtime.Scheduler.State;
-import com.google.android.material.motion.runtime.Scheduler.StateListener;
-import com.google.android.material.motion.runtime.Transaction;
+import com.google.android.material.motion.runtime.MotionRuntime;
+import com.google.android.material.motion.runtime.MotionRuntime.StateListener;
 import com.google.android.material.motion.transitions.Director.DirectorInstantiationException;
 import com.google.android.material.motion.transitions.Director.TransactCallback;
 import com.google.android.material.motion.transitions.Director.Work;
 import com.google.android.material.motion.transitions.TransitionDirector.Direction;
 
+import static com.google.android.material.motion.runtime.MotionRuntime.IDLE;
+
 /**
  *
  */
 public abstract class TransitionController implements TransactCallback, StateListener {
-  private Scheduler scheduler;
+  private MotionRuntime runtime;
   private TransitionDirector<?, ?> director;
 
   public abstract Class<? extends TransitionDirector<?, ?>> getDirectorClass();
@@ -37,12 +37,10 @@ public abstract class TransitionController implements TransactCallback, StateLis
   private void onStart(@Direction int initialDirection) {
     director = createDirector(getDirectorClass());
 
-    Transaction transaction = new Transaction();
-    director.setUp(transaction);
+    runtime = new MotionRuntime();
+    runtime.addStateListener(this);
 
-    scheduler = new Scheduler();
-    scheduler.addStateListener(this);
-    scheduler.commitTransaction(transaction);
+    director.setUp(runtime);
   }
 
   private void onFinish() {
@@ -50,7 +48,7 @@ public abstract class TransitionController implements TransactCallback, StateLis
   }
 
   private TransitionDirector<?, ?> createDirector(
-      Class<? extends TransitionDirector<?, ?>> directorClass) {
+    Class<? extends TransitionDirector<?, ?>> directorClass) {
     try {
       TransitionDirector<?, ?> director = directorClass.newInstance();
       director.setTransactCallback(this);
@@ -65,14 +63,12 @@ public abstract class TransitionController implements TransactCallback, StateLis
 
   @Override
   public void transact(Work work) {
-    Transaction transaction = new Transaction();
-    work.work(transaction);
-    scheduler.commitTransaction(transaction);
+    work.work(runtime);
   }
 
   @Override
-  public void onSchedulerStateChange(Scheduler scheduler, @State int newState) {
-    if (newState == Scheduler.IDLE) {
+  public void onStateChange(MotionRuntime runtime, @MotionRuntime.State int newState) {
+    if (newState == IDLE) {
       onFinish();
     }
   }
